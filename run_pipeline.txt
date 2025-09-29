@@ -1,0 +1,6 @@
+cd /home/lucapolenta/Desktop/ID_detector/pipeline
+
+python download_dataset.py
+python convert_to_yolo.py
+python split_dataset.py
+python train_yolo.py
