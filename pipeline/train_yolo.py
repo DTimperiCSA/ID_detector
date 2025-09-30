@@ -1,28 +1,35 @@
-# /home/lucapolenta/Desktop/ID_detector/pipeline/train_yolo.py
-import os
+# train_yolo.py
+import subprocess
+from pathlib import Path
 
-from paths import COCO_YAML, OUTPUT_DIR
+from paths import COCO_DIR, COCO_YAML, OUTPUT_DIR
 
+# Create YAML for YOLO
 yaml_content = f"""
-path: /home/lucapolenta/Desktop/ID_detector/coco
-train: images/train
-val: images/val
+path: {COCO_DIR}          # root dir containing images/ and labels/
+train: train              # relative to path
+val: val                  # relative to path
 nc: 1
 names: ['id_card']
 """
-with open(COCO_YAML, "w") as f:
-    f.write(yaml_content)
 
+COCO_YAML.parent.mkdir(parents=True, exist_ok=True)
+COCO_YAML.write_text(yaml_content)
 print(f"[OK] Dataset YAML written at {COCO_YAML}")
 
-os.system(
-    f"""
-yolo detect train \
-    data={COCO_YAML} \
-    model=yolov8n.pt \
-    epochs=50 \
-    imgsz=640 \
-    project={OUTPUT_DIR} \
-    name=midv500_yolo
-"""
-)
+# Train YOLOv8
+cmd = [
+    "yolo",
+    "detect",
+    "train",
+    f"data={COCO_YAML}",
+    "model=yolov8n.pt",
+    "epochs=50",
+    "imgsz=640",
+    f"project={OUTPUT_DIR}",
+    "name=midv500_yolo",
+]
+
+print("[INFO] Running YOLOv8 training...")
+subprocess.run(cmd, check=True)
+print("[OK] Training finished")
